@@ -1,0 +1,29 @@
+services:
+  cron:
+    image: bytekai/docker-auto-backup:latest
+    container_name: docker-auto-backup
+    hostname: docker-auto-backup
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backups:/backups
+    environment:
+      - TZ=Europe/Berlin
+      - ENCRYPTION_KEY=
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    labels:
+      backup.enabled: true
+      backup.storage: local
+      backup.storage.local.root_path: /backups
+      backup.provider: postgres
+      backup.frequency: daily
+      backup.time: 21:56
+      backup.location: local
+      backup.location.path: /backups
